@@ -18,7 +18,7 @@ def index():
     """Render the main dashboard"""
     try:
         data = get_dashboard_data()
-        return render_template("index.html", data=data)
+        return render_template("index1.html", data=data)
     except Exception as e:
         # Fallback to basic data in case of error
         error_data = {
