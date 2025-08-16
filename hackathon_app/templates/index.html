@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Disaster Alert Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+  <div class="container my-5">
+    <h1 class="text-center mb-4">🚨 Disaster Alert Dashboard</h1>
+
+    <!-- Status Banner -->
+    <div class="alert text-center fs-4 fw-bold
+         {% if data.status == 'ALERT' %} alert-danger {% else %} alert-success {% endif %}">
+      Current Status: {{ data.status }}
+    </div>
+
+    <!-- Tweets Section -->
+    <h3>Tweets</h3>
+    <ul class="list-group mb-4">
+      {% for tweet in data.tweets %}
+      <li class="list-group-item">
+        <strong>{{ tweet.user }}</strong>: {{ tweet.text }}
+        <span class="badge 
+            {% if tweet.sentiment == 'Positive' %} bg-success
+            {% elif tweet.sentiment == 'Negative' %} bg-danger
+            {% else %} bg-secondary {% endif %}">
+            {{ tweet.sentiment }}
+        </span>
+      </li>
+      {% endfor %}
+    </ul>
+
+    <!-- News Section -->
+    <h3>News</h3>
+    <ul class="list-group">
+      {% for article in data.news %}
+      <li class="list-group-item">{{ article.headline }}</li>
+      {% endfor %}
+    </ul>
+
+        <!-- Chart Section -->
+    <h3 class="mt-4">Sentiment Analysis</h3>
+    <canvas id="sentimentChart" height="120"></canvas>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      const data = {{ data.tweets | tojson }};
+      
+      // Count sentiments
+      let positive = 0, negative = 0, neutral = 0;
+      data.forEach(t => {
+        if (t.sentiment === "Positive") positive++;
+        else if (t.sentiment === "Negative") negative++;
+        else neutral++;
+      });
+
+      const ctx = document.getElementById('sentimentChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Positive', 'Negative', 'Neutral'],
+          datasets: [{
+            label: 'Tweet Sentiments',
+            data: [positive, negative, neutral],
+            backgroundColor: ['#28a745', '#dc3545', '#6c757d']
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1 } }
+          }
+        }
+      });
+    </script>
+  </div>
+
+
+
+</body>
+</html>
