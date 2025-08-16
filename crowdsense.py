@@ -24,7 +24,7 @@ MY_PHONE = os.getenv("MY_PHONE")
 # disaster keywords to monitor with location context
 DISASTER_KEYWORDS = [
     "earthquake",
-    "flood", 
+    "flood",
     "cyclone",
     "tsunami",
     "landslide",
@@ -34,8 +34,17 @@ DISASTER_KEYWORDS = [
 
 # Location keywords to look for in tweets
 LOCATION_KEYWORDS = [
-    "city", "region", "state", "country", "area", "zone", 
-    "district", "province", "county", "village", "town"
+    "city",
+    "region",
+    "state",
+    "country",
+    "area",
+    "zone",
+    "district",
+    "province",
+    "county",
+    "village",
+    "town",
 ]
 
 # thresholds & cooldown
@@ -53,11 +62,11 @@ api_retry_time = None
 twilio_client = Client(TWILIO_SID, TWILIO_AUTH)
 
 
-def send_sms_alert(message: str):
+def send_sms_alert(msg: str):
     """Send SMS using Twilio"""
     try:
         message = twilio_client.messages.create(
-            body=message,
+            body=msg,
             from_=TWILIO_PHONE,
             to=MY_PHONE,
         )
@@ -73,25 +82,27 @@ def extract_location_from_tweets(tweets_data, keyword):
     """Extract location information from tweets"""
     locations = []
     for tweet in tweets_data:
-        text = tweet.get('text', '').lower()
-        
+        text = tweet.get("text", "").lower()
+
         # Look for common location patterns
         location_patterns = [
-            r'\bin\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)',  # "in California", "in New York"
-            r'\bat\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)',  # "at Mumbai", "at Tokyo"
-            r'([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\s+(?:earthquake|flood|fire|storm)',  # "California earthquake"
+            r"\bin\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)",  # "in California", "in New York"
+            r"\bat\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)",  # "at Mumbai", "at Tokyo"
+            r"([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\s+(?:earthquake|flood|fire|storm)",  # "California earthquake"
         ]
-        
+
         for pattern in location_patterns:
             matches = re.findall(pattern, text)
             locations.extend(matches)
-    
+
     # Return most common location
     if locations:
         from collections import Counter
+
         most_common = Counter(locations).most_common(1)
         return most_common[0][0] if most_common else None
     return None
+
 
 def check_news(keyword, location=None):
     """Check related news with better query including location"""
@@ -103,24 +114,26 @@ def check_news(keyword, location=None):
         else:
             query = f'"{keyword}" disaster OR emergency'
             print(f"📰 Searching news for: {query}")
-            
+
         url = f"https://newsapi.org/v2/everything?q={query}&sortBy=publishedAt&apiKey={NEWS_API_KEY}&pageSize=3"
         res = requests.get(url).json()
-        
+
         articles = res.get("articles", [])
         if articles:
             print(f"✅ Found {len(articles)} relevant news articles")
             # Filter articles that actually mention the keyword
             relevant_articles = []
             for article in articles:
-                title_text = (article.get('title', '') + ' ' + article.get('description', '')).lower()
+                title_text = (
+                    article.get("title", "") + " " + article.get("description", "")
+                ).lower()
                 if keyword.lower() in title_text:
                     relevant_articles.append(article)
             return relevant_articles
         else:
             print("❌ No relevant news articles found")
             return []
-            
+
     except Exception as e:
         print(f"❌ News API error: {e}")
         return []
