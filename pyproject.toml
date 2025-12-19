@@ -1,9 +1,26 @@
-[project]
+[
+project]
 name = "crowdsense"
 version = "0.1.0"
-description = "Add your description here"
+description = "AI-powered real-time disaster detection system using ML, anomaly detection, and NLP."
 readme = "README.md"
 requires-python = ">=3.12"
+license = { file = "LICENSE" }
+authors = [
+    { name = "CrowdSense Contributors" }
+]
+keywords = ["disaster detection", "AI", "NLP", "anomaly detection", "real-time", "crowdsense"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Security",
+]
+urls = {"Homepage" = "https://github.com/your-org/crowdsense"}
 dependencies = [
     "aiohappyeyeballs==2.6.1",
     "aiohttp==3.12.15",
